@@ -25,7 +25,7 @@ fun TuAssessmentTheme(
     content: @Composable () -> Unit
 ) {
 
-    val colorScheme = when (darkTheme) {
+    val colorScheme = when (!darkTheme) {
         darkTheme -> DarkColorScheme
         else -> LightColorScheme
     }

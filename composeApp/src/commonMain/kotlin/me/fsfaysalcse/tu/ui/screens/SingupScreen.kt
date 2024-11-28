@@ -51,7 +51,9 @@ import tuassessment.composeapp.generated.resources.baseline_visibility_off_24
 import tuassessment.composeapp.generated.resources.compose_multiplatform
 
 @Composable
-fun LoginScreen() {
+fun SignupScreen() {
+    var name by remember { mutableStateOf("") }
+    var phone by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
@@ -75,7 +77,7 @@ fun LoginScreen() {
         )
 
         Text(
-            text = "Login".uppercase(),
+            text = "Signup".uppercase(),
             fontSize = 13.sp,
             fontWeight = FontWeight.Medium,
             letterSpacing = 10.sp,
@@ -84,7 +86,51 @@ fun LoginScreen() {
             modifier = Modifier.fillMaxWidth()
         )
 
-        Spacer(modifier = Modifier.fillMaxWidth().height(30.dp))
+
+        Spacer(modifier = Modifier.height(30.dp))
+
+        // Name Field
+        OutlinedTextField(
+            value = name,
+            onValueChange = { name = it },
+            label = { Text("Name") },
+            modifier = Modifier.fillMaxWidth(),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+            singleLine = true,
+            colors = TextFieldDefaults.colors(
+                focusedPlaceholderColor = MaterialTheme.colorScheme.onSurface,
+                focusedLabelColor = MaterialTheme.colorScheme.onSurface,
+                focusedIndicatorColor = MaterialTheme.colorScheme.onSurface,
+                focusedContainerColor = Color.Transparent,
+                unfocusedContainerColor = Color.Transparent,
+                focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                cursorColor = MaterialTheme.colorScheme.onSurface
+            )
+        )
+
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Phone Field
+        OutlinedTextField(
+            value = phone,
+            onValueChange = { phone = it },
+            label = { Text("Phone") },
+            modifier = Modifier.fillMaxWidth(),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+            singleLine = true,
+            colors = TextFieldDefaults.colors(
+                focusedPlaceholderColor = MaterialTheme.colorScheme.onSurface,
+                focusedLabelColor = MaterialTheme.colorScheme.onSurface,
+                focusedIndicatorColor = MaterialTheme.colorScheme.onSurface,
+                focusedContainerColor = Color.Transparent,
+                unfocusedContainerColor = Color.Transparent,
+                focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                cursorColor = MaterialTheme.colorScheme.onSurface
+            )
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
 
         // Email Field
         OutlinedTextField(
@@ -151,7 +197,7 @@ fun LoginScreen() {
             )
         ) {
             Text(
-                text = "Sign In".uppercase(),
+                text = "Signup".uppercase(),
                 fontSize = 18.sp,
                 color = Color.White,
                 fontWeight = FontWeight.Bold,
@@ -171,7 +217,7 @@ fun LoginScreen() {
                         color = MaterialTheme.colorScheme.onSurface
                     )
                 ) {
-                    append("Don't have an account? ")
+                    append("Already have an account? ")
                 }
 
                 withStyle(
@@ -180,7 +226,7 @@ fun LoginScreen() {
                         color = TuGrey
                     )
                 ) {
-                    append("Sign up".uppercase())
+                    append("Login".uppercase())
                 }
             }
 
@@ -195,6 +241,6 @@ fun LoginScreen() {
 
 @Preview
 @Composable
-fun PreviewLogin(modifier: Modifier = Modifier) {
+fun SignupScreenPreview(modifier: Modifier = Modifier) {
     LoginScreen()
 }

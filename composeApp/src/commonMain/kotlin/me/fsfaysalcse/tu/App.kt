@@ -13,7 +13,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import me.fsfaysalcse.tu.ui.screens.HomeScreen
 import me.fsfaysalcse.tu.ui.screens.LoginScreen
+import me.fsfaysalcse.tu.ui.screens.SignupScreen
 import me.fsfaysalcse.tu.ui.theme.TuAssessmentTheme
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -40,6 +42,6 @@ fun App() {
             }
         }*/
 
-        LoginScreen()
+        HomeScreen()
     }
 }
