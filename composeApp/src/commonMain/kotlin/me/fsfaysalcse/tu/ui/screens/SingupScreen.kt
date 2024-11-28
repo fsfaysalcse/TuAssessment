@@ -2,6 +2,7 @@ package me.fsfaysalcse.tu.ui.screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -41,8 +42,10 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 import me.fsfaysalcse.tu.ui.theme.TuGrey
 import me.fsfaysalcse.tu.ui.theme.TuMain
+import me.fsfaysalcse.tu.ui.util.Screen
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import tuassessment.composeapp.generated.resources.Res
@@ -51,7 +54,7 @@ import tuassessment.composeapp.generated.resources.baseline_visibility_off_24
 import tuassessment.composeapp.generated.resources.compose_multiplatform
 
 @Composable
-fun SignupScreen() {
+fun SignupScreen(navController: NavHostController) {
     var name by remember { mutableStateOf("") }
     var phone by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
@@ -189,7 +192,9 @@ fun SignupScreen() {
 
         // Sign-in Button
         Button(
-            onClick = { /* Handle sign-in action */ },
+            onClick = {
+                navController.navigate(Screen.Home.route)
+            },
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(10.dp),
             colors = ButtonDefaults.buttonColors(
@@ -233,14 +238,12 @@ fun SignupScreen() {
             Text(
                 text = text,
                 fontSize = 16.sp,
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
+                modifier = Modifier.clickable {
+                    navController.navigate(Screen.Login.route)
+                }
             )
         }
     }
 }
 
-@Preview
-@Composable
-fun SignupScreenPreview(modifier: Modifier = Modifier) {
-    LoginScreen()
-}
