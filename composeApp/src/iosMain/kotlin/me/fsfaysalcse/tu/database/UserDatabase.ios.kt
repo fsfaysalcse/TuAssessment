@@ -3,7 +3,7 @@ package me.fsfaysalcse.tu.database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import kotlinx.cinterop.ExperimentalForeignApi
-import me.fsfaysalcse.tu.database.UserDatabase
+import me.fsfaysalcse.tu.data.database.UserDatabase
 import platform.Foundation.NSDocumentDirectory
 import platform.Foundation.NSFileManager
 import platform.Foundation.NSUserDomainMask

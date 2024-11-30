@@ -3,7 +3,7 @@ package me.fsfaysalcse.tu.database
 import android.content.Context
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import me.fsfaysalcse.tu.database.UserDatabase
+import me.fsfaysalcse.tu.data.database.UserDatabase
 
 fun getDatabaseBuilder(ctx: Context): RoomDatabase.Builder<UserDatabase> {
     val appContext = ctx.applicationContext

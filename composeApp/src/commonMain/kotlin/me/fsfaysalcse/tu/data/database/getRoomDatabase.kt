@@ -1,4 +1,4 @@
-package me.fsfaysalcse.tu.database
+package me.fsfaysalcse.tu.data.database
 
 import androidx.room.RoomDatabase
 import androidx.sqlite.driver.bundled.BundledSQLiteDriver
