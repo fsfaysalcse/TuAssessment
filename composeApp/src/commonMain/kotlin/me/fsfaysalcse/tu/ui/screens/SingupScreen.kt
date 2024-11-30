@@ -11,8 +11,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -47,7 +49,6 @@ import me.fsfaysalcse.tu.ui.theme.TuGrey
 import me.fsfaysalcse.tu.ui.theme.TuMain
 import me.fsfaysalcse.tu.ui.util.Screen
 import org.jetbrains.compose.resources.painterResource
-import org.jetbrains.compose.ui.tooling.preview.Preview
 import tuassessment.composeapp.generated.resources.Res
 import tuassessment.composeapp.generated.resources.baseline_visibility_24
 import tuassessment.composeapp.generated.resources.baseline_visibility_off_24
@@ -64,6 +65,7 @@ fun SignupScreen(navController: NavHostController) {
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .verticalScroll(rememberScrollState())
             .background(MaterialTheme.colorScheme.surface)
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -177,6 +179,8 @@ fun SignupScreen(navController: NavHostController) {
                     Icon(painter = painterResource(icon), contentDescription = null)
                 }
             },
+            keyboardOptions = KeyboardOptions.Default,
+            singleLine = true,
             colors = TextFieldDefaults.colors(
                 focusedPlaceholderColor = MaterialTheme.colorScheme.onSurface,
                 focusedLabelColor = MaterialTheme.colorScheme.onSurface,
