@@ -29,8 +29,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -58,7 +56,6 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.navigation.NavHostController
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import me.fsfaysalcse.tu.data.database.IS_USER_LOGGED_IN
 import me.fsfaysalcse.tu.data.database.LOGGED_IN_USER_EMAIL
@@ -91,24 +88,27 @@ fun SignupScreen(
     var passwordVisible by remember { mutableStateOf(false) }
     val snackBarHostState = remember { SnackbarHostState() }
 
-    val signupUiState = viewModel.userSignupState.value
-
-    LaunchedEffect(signupUiState) {
-        when (signupUiState) {
+    when (val signupUiState = viewModel.userSignupState.value) {
             SignupUiState.Success -> {
-                snackBarHostState.showSnackbar("Signup Successful")
                 scope.launch {
                     prefs.edit {
                         it[booleanPreferencesKey(IS_USER_LOGGED_IN)] = true
                         it[stringPreferencesKey(LOGGED_IN_USER_EMAIL)] = email
                     }
                 }
-                navController.navigate(Screen.Home.route)
+                navController.navigate(Screen.Home.route) {
+                    popUpTo(Screen.Signup.route) {
+                        inclusive = true
+                    }
+                }
             }
 
-            is SignupUiState.Error -> snackBarHostState.showSnackbar(signupUiState.message)
+            is SignupUiState.Error -> {
+                scope.launch {
+                    snackBarHostState.showSnackbar(signupUiState.message)
+                }
+            }
             else -> Unit
-        }
     }
 
     Scaffold(

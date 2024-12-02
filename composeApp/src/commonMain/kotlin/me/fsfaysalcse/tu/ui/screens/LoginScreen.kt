@@ -92,15 +92,15 @@ fun LoginScreen(
                     it[booleanPreferencesKey(IS_USER_LOGGED_IN)] = true
                     it[stringPreferencesKey(LOGGED_IN_USER_EMAIL)] = email
                 }
-
-                navController.navigate(Screen.Home.route) {
-                    popUpTo(Screen.Login.route) {
-                        inclusive = true
-                    }
-                }
-
-                viewModel.clearLoginState()
             }
+
+            navController.navigate(Screen.Home.route) {
+                popUpTo(Screen.Login.route) {
+                    inclusive = true
+                }
+            }
+
+            viewModel.clearLoginState()
         }
 
         is LoginUiState.Error -> {

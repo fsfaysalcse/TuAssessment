@@ -148,10 +148,8 @@ fun HomeScreen(
                         coroutineScope.launch {
                             // Clear the preferences and user state
                             prefs.edit { it.clear() }
-                            viewModel.clearHomeState()
-                            viewModel.clearLoginState()
 
-                            // Navigate to the Login screen and clear the navigation stack
+                             // Navigate to the Login screen and clear the navigation stack
                             navController.navigate(Screen.Splash.route) {
                                 popUpTo(Screen.Home.route) {
                                     inclusive = true

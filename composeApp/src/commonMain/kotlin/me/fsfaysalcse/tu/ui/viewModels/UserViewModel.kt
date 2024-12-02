@@ -95,7 +95,7 @@ class UserViewModel(
     }
 
     fun clearLoginState() {
-        //userLoginState_.value = LoginUiState.Empty
+        userLoginState_.value = LoginUiState.Empty
     }
 
 
