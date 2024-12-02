@@ -94,6 +94,10 @@ class UserViewModel(
         }
     }
 
+    fun clearLoginState() {
+        //userLoginState_.value = LoginUiState.Empty
+    }
+
 
     private var homeUiState_ = mutableStateOf<HomeUiState>(HomeUiState.Empty)
     val homeUiState: State<HomeUiState> = homeUiState_
@@ -110,6 +114,10 @@ class UserViewModel(
                 homeUiState_.value = HomeUiState.Error(e.message ?: "Unknown error")
             }
         }
+    }
+
+    fun clearHomeState() {
+        homeUiState_.value = HomeUiState.Empty
     }
 
     fun clearDatabase() {

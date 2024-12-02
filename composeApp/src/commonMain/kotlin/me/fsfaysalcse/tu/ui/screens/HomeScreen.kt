@@ -20,6 +20,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -33,8 +34,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.navigation.NavHostController
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import me.fsfaysalcse.tu.data.database.LOGGED_IN_USER_EMAIL
 import me.fsfaysalcse.tu.data.models.User
 import me.fsfaysalcse.tu.ui.theme.TuMain
 import me.fsfaysalcse.tu.ui.uiStates.HomeUiState
@@ -50,28 +57,26 @@ import tuassessment.composeapp.generated.resources.compose_multiplatform
 fun HomeScreen(
     navController: NavHostController,
     viewModel: UserViewModel,
-    email: String?
+    prefs: DataStore<Preferences>
 ) {
     val coroutineScope = rememberCoroutineScope()
     val snackBarHostState = remember { SnackbarHostState() }
     var userInfo by remember { mutableStateOf<User?>(null) }
 
-    LaunchedEffect(email) {
-        viewModel.getUserByEmail(email = email.toString())
+    val loggedInUserEmail = prefs.data
+        .map { it[stringPreferencesKey(LOGGED_IN_USER_EMAIL)] }
+        .collectAsState(initial = null).value
+
+    LaunchedEffect(loggedInUserEmail) {
+        loggedInUserEmail?.let { viewModel.getUserByEmail(email = it) }
     }
 
     val homeUiState = viewModel.homeUiState.value
 
     LaunchedEffect(homeUiState) {
         when (homeUiState) {
-            is HomeUiState.Success -> {
-                userInfo = homeUiState.user
-            }
-
-            is HomeUiState.Error -> {
-                snackBarHostState.showSnackbar(homeUiState.message)
-            }
-
+            is HomeUiState.Success -> userInfo = homeUiState.user
+            is HomeUiState.Error -> snackBarHostState.showSnackbar(homeUiState.message)
             else -> Unit
         }
     }
@@ -106,7 +111,7 @@ fun HomeScreen(
                     modifier = Modifier.fillMaxWidth()
                 )
 
-                Spacer(modifier = Modifier.fillMaxWidth().height(30.dp))
+                Spacer(modifier = Modifier.height(30.dp))
 
                 Text(
                     text = "${userInfo?.name}\n${userInfo?.email}",
@@ -117,10 +122,10 @@ fun HomeScreen(
                     modifier = Modifier.fillMaxWidth()
                 )
 
-                Spacer(modifier = Modifier.fillMaxWidth().height(10.dp))
+                Spacer(modifier = Modifier.height(10.dp))
 
                 Text(
-                    text = "Last Logged In : ${getCurrentDateTime()}",
+                    text = "Last Logged In: ${getCurrentDateTime()}",
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Normal,
                     textAlign = TextAlign.Center,
@@ -128,7 +133,7 @@ fun HomeScreen(
                     modifier = Modifier.fillMaxWidth()
                 )
 
-                Spacer(modifier = Modifier.fillMaxWidth().height(30.dp))
+                Spacer(modifier = Modifier.height(30.dp))
 
                 CountdownText(initialCountdownValue = 60) {
                     coroutineScope.launch {
@@ -136,17 +141,27 @@ fun HomeScreen(
                     }
                 }
 
-                Spacer(modifier = Modifier.fillMaxWidth().height(100.dp))
+                Spacer(modifier = Modifier.height(100.dp))
 
                 Button(
                     onClick = {
-                        navController.navigate(Screen.Home.route)
+                        coroutineScope.launch {
+                            // Clear the preferences and user state
+                            prefs.edit { it.clear() }
+                            viewModel.clearHomeState()
+                            viewModel.clearLoginState()
+
+                            // Navigate to the Login screen and clear the navigation stack
+                            navController.navigate(Screen.Splash.route) {
+                                popUpTo(Screen.Home.route) {
+                                    inclusive = true
+                                }
+                            }
+                        }
                     },
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(10.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = TuMain
-                    )
+                    colors = ButtonDefaults.buttonColors(containerColor = TuMain)
                 ) {
                     Text(
                         text = "Logout".uppercase(),
@@ -160,3 +175,4 @@ fun HomeScreen(
         }
     )
 }
+

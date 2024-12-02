@@ -3,15 +3,16 @@ package me.fsfaysalcse.tu
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
 import androidx.navigation.NavHostController
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
 import me.fsfaysalcse.tu.ui.screens.HomeScreen
 import me.fsfaysalcse.tu.ui.screens.LoginScreen
 import me.fsfaysalcse.tu.ui.screens.SignupScreen
+import me.fsfaysalcse.tu.ui.screens.SplashScreen
 import me.fsfaysalcse.tu.ui.theme.TuAssessmentTheme
 import me.fsfaysalcse.tu.ui.util.Screen
 import me.fsfaysalcse.tu.ui.viewModels.UserViewModel
@@ -20,41 +21,46 @@ import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 @Preview
-fun App() {
+fun App(prefs: DataStore<Preferences>) {
     val viewModel = koinViewModel<UserViewModel>()
+    val navController: NavHostController = rememberNavController()
+
 
     TuAssessmentTheme {
-
-        val navController: NavHostController = rememberNavController()
-
         NavHost(
             navController = navController,
-            startDestination = Screen.Login.route,
+            startDestination = Screen.Splash.route,
             modifier = Modifier.fillMaxSize()
         ) {
+
+            composable(route = Screen.Splash.route) {
+                SplashScreen(
+                    navController = navController,
+                    prefs = prefs
+                )
+            }
+
             composable(route = Screen.Login.route) {
                 LoginScreen(
                     navController = navController,
-                    viewModel = viewModel
+                    viewModel = viewModel,
+                    prefs = prefs
                 )
             }
 
             composable(route = Screen.Signup.route) {
                 SignupScreen(
                     navController = navController,
-                    viewModel = viewModel
+                    viewModel = viewModel,
+                    prefs = prefs
                 )
             }
 
-            composable(
-                route = Screen.Home.route,
-                arguments = listOf(navArgument("email") { type = NavType.StringType })
-            ) { backStackEntry ->
-                val email = backStackEntry.arguments?.getString("email")
+            composable(route = Screen.Home.route) {
                 HomeScreen(
                     navController = navController,
                     viewModel = viewModel,
-                    email = email
+                    prefs = prefs
                 )
             }
         }

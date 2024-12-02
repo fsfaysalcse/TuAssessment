@@ -2,7 +2,6 @@ package me.fsfaysalcse.tu.ui.screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -30,10 +29,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -51,8 +50,15 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.navigation.NavHostController
-import me.fsfaysalcse.tu.data.models.User
+import kotlinx.coroutines.launch
+import me.fsfaysalcse.tu.data.database.IS_USER_LOGGED_IN
+import me.fsfaysalcse.tu.data.database.LOGGED_IN_USER_EMAIL
 import me.fsfaysalcse.tu.ui.theme.TuGrey
 import me.fsfaysalcse.tu.ui.theme.TuMain
 import me.fsfaysalcse.tu.ui.uiStates.LoginUiState
@@ -65,7 +71,12 @@ import tuassessment.composeapp.generated.resources.baseline_visibility_off_24
 import tuassessment.composeapp.generated.resources.compose_multiplatform
 
 @Composable
-fun LoginScreen(navController: NavHostController, viewModel: UserViewModel) {
+fun LoginScreen(
+    navController: NavHostController,
+    viewModel: UserViewModel,
+    prefs: DataStore<Preferences>
+) {
+    val scope = rememberCoroutineScope()
     val snackBarHostState = remember { SnackbarHostState() }
     val keyboardController = LocalSoftwareKeyboardController.current
 
@@ -74,18 +85,31 @@ fun LoginScreen(navController: NavHostController, viewModel: UserViewModel) {
     var password by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
 
-    val loginUiState = viewModel.userLoginState.value
-    LaunchedEffect(loginUiState) {
-        when (loginUiState) {
-            LoginUiState.Success -> {
-                snackBarHostState.showSnackbar("Signup Successful")
-                navController.navigate(Screen.Home.createRoute(email = email))
-            }
+    when (val loginUiState = viewModel.userLoginState.value) {
+        LoginUiState.Success -> {
+            scope.launch {
+                prefs.edit {
+                    it[booleanPreferencesKey(IS_USER_LOGGED_IN)] = true
+                    it[stringPreferencesKey(LOGGED_IN_USER_EMAIL)] = email
+                }
 
-            is LoginUiState.Error -> snackBarHostState.showSnackbar(loginUiState.message)
-            else -> Unit
+                navController.navigate(Screen.Home.route) {
+                    popUpTo(Screen.Login.route) {
+                        inclusive = true
+                    }
+                }
+
+                viewModel.clearLoginState()
+            }
         }
+
+        is LoginUiState.Error -> {
+            scope.launch { snackBarHostState.showSnackbar(loginUiState.message) }
+        }
+
+        else -> Unit
     }
+
 
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackBarHostState) },
@@ -103,15 +127,13 @@ fun LoginScreen(navController: NavHostController, viewModel: UserViewModel) {
             ) {
                 Image(
                     painter = painterResource(Res.drawable.compose_multiplatform),
-                    contentDescription = "App Logo",
+                    contentDescription = null,
                     colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onSurface),
-                    modifier = Modifier
-                        .size(100.dp)
-                        .padding(bottom = 32.dp)
+                    modifier = Modifier.size(100.dp).padding(bottom = 32.dp)
                 )
 
                 Text(
-                    text = "Login".uppercase(),
+                    text = "LOGIN",
                     fontSize = 13.sp,
                     fontWeight = FontWeight.Medium,
                     letterSpacing = 10.sp,
@@ -120,7 +142,7 @@ fun LoginScreen(navController: NavHostController, viewModel: UserViewModel) {
                     modifier = Modifier.fillMaxWidth()
                 )
 
-                Spacer(modifier = Modifier.fillMaxWidth().height(30.dp))
+                Spacer(modifier = Modifier.height(30.dp))
 
                 OutlinedTextField(
                     value = email,
@@ -153,13 +175,14 @@ fun LoginScreen(navController: NavHostController, viewModel: UserViewModel) {
                         PasswordVisualTransformation()
                     },
                     trailingIcon = {
-                        val icon = if (passwordVisible) {
-                            Res.drawable.baseline_visibility_24
-                        } else {
-                            Res.drawable.baseline_visibility_off_24
-                        }
                         IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                            Icon(painter = painterResource(icon), contentDescription = null)
+                            Icon(
+                                painter = painterResource(
+                                    if (passwordVisible) Res.drawable.baseline_visibility_24
+                                    else Res.drawable.baseline_visibility_off_24
+                                ),
+                                contentDescription = null
+                            )
                         }
                     },
                     keyboardActions = KeyboardActions.Default,
@@ -184,12 +207,10 @@ fun LoginScreen(navController: NavHostController, viewModel: UserViewModel) {
                     },
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(10.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = TuMain
-                    )
+                    colors = ButtonDefaults.buttonColors(containerColor = TuMain)
                 ) {
                     Text(
-                        text = "Sign In".uppercase(),
+                        text = "SIGN IN",
                         fontSize = 18.sp,
                         color = Color.White,
                         fontWeight = FontWeight.Bold,
@@ -199,7 +220,7 @@ fun LoginScreen(navController: NavHostController, viewModel: UserViewModel) {
 
                 Spacer(modifier = Modifier.height(32.dp))
 
-                TextButton(onClick = { /* Handle sign-up navigation */ }) {
+                TextButton(onClick = { navController.navigate(Screen.Signup.route) }) {
                     val text = buildAnnotatedString {
                         withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.onSurface)) {
                             append("Don't have an account? ")
@@ -210,23 +231,16 @@ fun LoginScreen(navController: NavHostController, viewModel: UserViewModel) {
                                 textDecoration = TextDecoration.Underline
                             )
                         ) {
-                            append("Sign up".uppercase())
+                            append("SIGN UP")
                         }
                     }
-
-                    Text(
-                        text = text,
-                        fontSize = 16.sp,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.clickable {
-                            navController.navigate(Screen.Signup.route)
-                        }
-                    )
+                    Text(text = text, fontSize = 16.sp, textAlign = TextAlign.Center)
                 }
             }
         }
     )
 }
+
 
 
 

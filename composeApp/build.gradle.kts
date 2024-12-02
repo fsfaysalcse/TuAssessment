@@ -51,14 +51,17 @@ kotlin {
             implementation(libs.androidx.lifecycle.runtime.compose)
 
             implementation(libs.compose.navigation)
-            implementation(libs.landscapist.coil3)
             implementation(libs.room.runtime)
             implementation(libs.sqlite.bundled)
             implementation(libs.koin.core)
             implementation(libs.koin.compose)
             implementation(libs.koin.compose.viewmodel)
 
-            implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.0")
+
+            api(libs.datastore.preferences)
+            api(libs.datastore)
+
+            implementation(libs.kotlinx.datetime)
         }
     }
 }
@@ -99,6 +102,7 @@ room {
 }
 
 dependencies {
+    implementation(project(":composeApp"))
     implementation(project(":composeApp"))
     ksp(libs.room.compiler)
 }

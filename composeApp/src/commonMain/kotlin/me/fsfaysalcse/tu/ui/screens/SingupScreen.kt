@@ -30,9 +30,11 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -50,7 +52,16 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.navigation.NavHostController
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
+import me.fsfaysalcse.tu.data.database.IS_USER_LOGGED_IN
+import me.fsfaysalcse.tu.data.database.LOGGED_IN_USER_EMAIL
 import me.fsfaysalcse.tu.data.database.UserEntity
 import me.fsfaysalcse.tu.ui.theme.TuGrey
 import me.fsfaysalcse.tu.ui.theme.TuMain
@@ -64,8 +75,13 @@ import tuassessment.composeapp.generated.resources.baseline_visibility_off_24
 import tuassessment.composeapp.generated.resources.compose_multiplatform
 
 @Composable
-fun SignupScreen(navController: NavHostController, viewModel: UserViewModel) {
+fun SignupScreen(
+    navController: NavHostController,
+    viewModel: UserViewModel,
+    prefs: DataStore<Preferences>
+) {
 
+    val scope = rememberCoroutineScope()
     val keyboardController = LocalSoftwareKeyboardController.current
 
     var name by remember { mutableStateOf("") }
@@ -77,12 +93,17 @@ fun SignupScreen(navController: NavHostController, viewModel: UserViewModel) {
 
     val signupUiState = viewModel.userSignupState.value
 
-
     LaunchedEffect(signupUiState) {
         when (signupUiState) {
             SignupUiState.Success -> {
                 snackBarHostState.showSnackbar("Signup Successful")
-                navController.navigate(Screen.Home.createRoute(email = email))
+                scope.launch {
+                    prefs.edit {
+                        it[booleanPreferencesKey(IS_USER_LOGGED_IN)] = true
+                        it[stringPreferencesKey(LOGGED_IN_USER_EMAIL)] = email
+                    }
+                }
+                navController.navigate(Screen.Home.route)
             }
 
             is SignupUiState.Error -> snackBarHostState.showSnackbar(signupUiState.message)
