@@ -51,7 +51,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import me.fsfaysalcse.tu.data.models.User
+import me.fsfaysalcse.tu.data.database.UserEntity
 import me.fsfaysalcse.tu.ui.theme.TuGrey
 import me.fsfaysalcse.tu.ui.theme.TuMain
 import me.fsfaysalcse.tu.ui.uiStates.SignupUiState
@@ -74,6 +74,7 @@ fun SignupScreen(navController: NavHostController, viewModel: UserViewModel) {
     var password by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
     val snackBarHostState = remember { SnackbarHostState() }
+
     val signupUiState = viewModel.userSignupState.value
 
 
@@ -81,10 +82,7 @@ fun SignupScreen(navController: NavHostController, viewModel: UserViewModel) {
         when (signupUiState) {
             SignupUiState.Success -> {
                 snackBarHostState.showSnackbar("Signup Successful")
-                navController.navigate(Screen.Home.route) {
-                    popUpTo(Screen.Signup.route) { inclusive = true }
-                    launchSingleTop = true
-                }
+                navController.navigate(Screen.Home.createRoute(email = email))
             }
 
             is SignupUiState.Error -> snackBarHostState.showSnackbar(signupUiState.message)
@@ -215,7 +213,14 @@ fun SignupScreen(navController: NavHostController, viewModel: UserViewModel) {
                 Button(
                     onClick = {
                         keyboardController?.hide()
-                        viewModel.signup(User(name, email, password, phone))
+                        viewModel.signup(
+                            UserEntity(
+                                name = name,
+                                email = email,
+                                password = password,
+                                phone = phone
+                            )
+                        )
                     },
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(10.dp),

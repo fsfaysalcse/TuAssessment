@@ -7,7 +7,7 @@ import androidx.room.RoomDatabaseConstructor
 
 @Database(
     entities = [UserEntity::class],
-    version = 1
+    version = 2
 )
 @ConstructedBy(UserDatabaseConstructor::class)
 abstract class UserDatabase : RoomDatabase() {

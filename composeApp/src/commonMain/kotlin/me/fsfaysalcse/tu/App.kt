@@ -4,9 +4,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import me.fsfaysalcse.tu.ui.screens.HomeScreen
 import me.fsfaysalcse.tu.ui.screens.LoginScreen
 import me.fsfaysalcse.tu.ui.screens.SignupScreen
@@ -44,8 +46,16 @@ fun App() {
                 )
             }
 
-            composable(route = Screen.Home.route) {
-                HomeScreen(navController = navController)
+            composable(
+                route = Screen.Home.route,
+                arguments = listOf(navArgument("email") { type = NavType.StringType })
+            ) { backStackEntry ->
+                val email = backStackEntry.arguments?.getString("email")
+                HomeScreen(
+                    navController = navController,
+                    viewModel = viewModel,
+                    email = email
+                )
             }
         }
     }

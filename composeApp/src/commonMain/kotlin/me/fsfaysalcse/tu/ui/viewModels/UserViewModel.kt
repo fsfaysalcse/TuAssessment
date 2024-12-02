@@ -1,13 +1,12 @@
 package me.fsfaysalcse.tu.ui.viewModels
 
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import me.fsfaysalcse.tu.data.database.UserDatabase
-import me.fsfaysalcse.tu.data.models.User
+import me.fsfaysalcse.tu.data.database.UserEntity
 import me.fsfaysalcse.tu.ui.uiStates.HomeUiState
 import me.fsfaysalcse.tu.ui.uiStates.LoginUiState
 import me.fsfaysalcse.tu.ui.uiStates.SignupUiState
@@ -16,9 +15,6 @@ class UserViewModel(
     private val userDatabase: UserDatabase
 ) : ViewModel() {
 
-
-    var userInfo: MutableState<HomeUiState?> = mutableStateOf(null)
-        private set
 
     init {
         viewModelScope.launch {
@@ -31,7 +27,7 @@ class UserViewModel(
     private var userSignupState_ = mutableStateOf<SignupUiState>(SignupUiState.Empty)
     val userSignupState: State<SignupUiState> = userSignupState_
 
-    fun signup(user: User) {
+    fun signup(user: UserEntity) {
         userSignupState_.value = SignupUiState.Empty
 
         if (user.name.isBlank()) {
@@ -55,9 +51,10 @@ class UserViewModel(
             return
         }
 
+
         viewModelScope.launch {
             try {
-                userDatabase.userDao().signup(user.toUserEntity())
+                userDatabase.userDao().signup(user)
                 userSignupState_.value = SignupUiState.Success
             } catch (e: Exception) {
                 userSignupState_.value = SignupUiState.Error(e.message ?: "An error occurred.")
@@ -98,14 +95,19 @@ class UserViewModel(
     }
 
 
+    private var homeUiState_ = mutableStateOf<HomeUiState>(HomeUiState.Empty)
+    val homeUiState: State<HomeUiState> = homeUiState_
+
+
+
     fun getUserByEmail(email: String) {
-        userInfo.value = HomeUiState.Empty
+        homeUiState_.value = HomeUiState.Empty
         viewModelScope.launch {
             try {
                 val user = userDatabase.userDao().getUserByEmail(email)
-                userInfo.value = HomeUiState.Success(user.toUser())
+                homeUiState_.value = HomeUiState.Success(user.toUser())
             } catch (e: Exception) {
-                userInfo.value = null
+                homeUiState_.value = HomeUiState.Error(e.message ?: "Unknown error")
             }
         }
     }

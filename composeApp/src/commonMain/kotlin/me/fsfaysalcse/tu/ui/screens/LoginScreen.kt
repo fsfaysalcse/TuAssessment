@@ -52,6 +52,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import me.fsfaysalcse.tu.data.models.User
 import me.fsfaysalcse.tu.ui.theme.TuGrey
 import me.fsfaysalcse.tu.ui.theme.TuMain
 import me.fsfaysalcse.tu.ui.uiStates.LoginUiState
@@ -68,6 +69,7 @@ fun LoginScreen(navController: NavHostController, viewModel: UserViewModel) {
     val snackBarHostState = remember { SnackbarHostState() }
     val keyboardController = LocalSoftwareKeyboardController.current
 
+
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
@@ -77,10 +79,7 @@ fun LoginScreen(navController: NavHostController, viewModel: UserViewModel) {
         when (loginUiState) {
             LoginUiState.Success -> {
                 snackBarHostState.showSnackbar("Signup Successful")
-                navController.navigate(Screen.Home.route) {
-                    popUpTo(Screen.Login.route) { inclusive = true }
-                    launchSingleTop = true
-                }
+                navController.navigate(Screen.Home.createRoute(email = email))
             }
 
             is LoginUiState.Error -> snackBarHostState.showSnackbar(loginUiState.message)
