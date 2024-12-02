@@ -62,6 +62,8 @@ kotlin {
             api(libs.datastore)
 
             implementation(libs.kotlinx.datetime)
+
+            implementation(libs.konnectivity)
         }
     }
 }

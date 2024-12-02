@@ -39,6 +39,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.navigation.NavHostController
+import com.plusmobileapps.konnectivity.Konnectivity
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import me.fsfaysalcse.tu.data.database.LOGGED_IN_USER_EMAIL
@@ -59,6 +60,10 @@ fun HomeScreen(
     viewModel: UserViewModel,
     prefs: DataStore<Preferences>
 ) {
+
+    val konnectivity = remember { Konnectivity() }
+    val isConnected by konnectivity.isConnectedState.collectAsState()
+
     val coroutineScope = rememberCoroutineScope()
     val snackBarHostState = remember { SnackbarHostState() }
     var userInfo by remember { mutableStateOf<User?>(null) }
@@ -137,7 +142,12 @@ fun HomeScreen(
 
                 CountdownText(initialCountdownValue = 60) {
                     coroutineScope.launch {
-                        snackBarHostState.showSnackbar("New Information has been sent to server")
+                        if (isConnected) {
+                            snackBarHostState.showSnackbar("New Information has been sent to server")
+                        } else {
+                            snackBarHostState.showSnackbar("No Internet 202")
+                        }
+
                     }
                 }
 

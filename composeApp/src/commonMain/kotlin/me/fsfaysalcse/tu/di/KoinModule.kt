@@ -12,7 +12,6 @@ expect val targetModule: Module
 
 val sharedModule = module {
     single { getRoomDatabase(get()) }
-    single { getRoomDatabase(get()) }
     viewModelOf(::UserViewModel)
 }
 
